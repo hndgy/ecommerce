@@ -7,9 +7,12 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.validation.constraints.NotNull;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 
 
 @Entity
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class Product {
     
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,6 +25,16 @@ public class Product {
     private Double price;
 
     private String pictureUrl;
+
+    public Product(Long id, @NotNull(message = "Le nom est requit") String name, Double price, String pictureUrl) {
+        this.id = id;
+        this.name = name;
+        this.price = price;
+        this.pictureUrl = pictureUrl;
+    }
+
+    public Product(){}
+
 
     public Long getId() {
         return id;

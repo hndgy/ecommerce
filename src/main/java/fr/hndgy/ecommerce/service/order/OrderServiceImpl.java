@@ -1,6 +1,7 @@
 package fr.hndgy.ecommerce.service.order;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -8,24 +9,29 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import fr.hndgy.ecommerce.dto.ProductOrder;
-import fr.hndgy.ecommerce.exception.RessourceNotFoundException;
+import fr.hndgy.ecommerce.dto.OrderProductDto;
+import fr.hndgy.ecommerce.exception.ResourceNotFoundException;
 import fr.hndgy.ecommerce.model.Order;
 import fr.hndgy.ecommerce.model.OrderProduct;
 import fr.hndgy.ecommerce.model.OrderStatus;
+import fr.hndgy.ecommerce.repository.OrderProductRepository;
 import fr.hndgy.ecommerce.repository.OrderRepository;
 import fr.hndgy.ecommerce.repository.ProductRepository;
+import fr.hndgy.ecommerce.service.orderProduct.OrderProductService;
+import fr.hndgy.ecommerce.service.product.ProductService;
 
 @Service
 @Transactional
 public class OrderServiceImpl implements OrderService{
 
     private final OrderRepository orderRepository;
-    private final ProductRepository productRepository;
+    private final OrderProductService orderProductService;
+    private final ProductService productService;
     
-    public OrderServiceImpl(OrderRepository orderRepository, ProductRepository productRepository) {
+    public OrderServiceImpl(OrderRepository orderRepository, OrderProductService orderProductService, ProductService productService) {
         this.orderRepository = orderRepository;
-        this.productRepository = productRepository;
+        this.orderProductService = orderProductService;
+        this.productService = productService;
     }
 
     
@@ -35,16 +41,30 @@ public class OrderServiceImpl implements OrderService{
     }
 
     @Override
-    public Order create(List<ProductOrder> productOrders) {
+    public Order create(List<OrderProductDto> productOrders) throws ResourceNotFoundException{
 
         var order = new Order();
         order.setDateCreated(LocalDateTime.now());
-        var listOrderProd = productOrders.stream().map((o) -> new OrderProduct(order, productRepository.findById(o.productId()).get(),o.quantity())).collect(Collectors.toList());
-        order.setOrderProducts(listOrderProd);
+
         order.setDateCreated(LocalDateTime.now());
 
         order.setStatus(OrderStatus.PENDING);
-        return orderRepository.save(order);
+
+        var savedOrder = orderRepository.save(order);
+
+        var listOrderProd = new ArrayList<OrderProduct>();
+
+        for (var po : productOrders) {
+            var product = this.productService.getProduct(po.productId());
+            var orderProduct = new OrderProduct(savedOrder, product, po.quantity());
+            var savedOP = orderProductService.create(orderProduct);
+            listOrderProd.add(savedOP);
+        }
+
+        savedOrder.setOrderProducts(listOrderProd);
+        update(savedOrder);
+
+        return savedOrder;
     }
 
     @Override

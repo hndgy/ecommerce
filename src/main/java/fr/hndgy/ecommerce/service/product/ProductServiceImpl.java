@@ -4,7 +4,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
-import fr.hndgy.ecommerce.exception.RessourceNotFoundException;
+import fr.hndgy.ecommerce.exception.ResourceNotFoundException;
 import fr.hndgy.ecommerce.model.Product;
 import fr.hndgy.ecommerce.repository.ProductRepository;
 
@@ -24,8 +24,8 @@ public class ProductServiceImpl implements ProductService{
     }
 
     @Override
-    public Product getProduct(Long id) throws RessourceNotFoundException {
-        return productRepository.findById(id).orElseThrow(() -> new RessourceNotFoundException());
+    public Product getProduct(Long id) throws ResourceNotFoundException {
+        return productRepository.findById(id).orElseThrow(() -> new ResourceNotFoundException());
     }
 
     @Override

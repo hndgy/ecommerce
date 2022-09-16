@@ -1,7 +1,6 @@
 package fr.hndgy.ecommerce.controller;
 
 import java.net.URI;
-import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -11,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import fr.hndgy.ecommerce.dto.OrderForm;
+import fr.hndgy.ecommerce.exception.ResourceNotFoundException;
 import fr.hndgy.ecommerce.model.Order;
 import fr.hndgy.ecommerce.service.order.OrderService;
 
@@ -25,7 +25,7 @@ public class OrderController {
     }
 
     @PostMapping({"/",""})
-    public ResponseEntity<Order> createOrder(@RequestBody OrderForm orderForm){
+    public ResponseEntity<Order> createOrder(@RequestBody OrderForm orderForm) throws ResourceNotFoundException{
         var order = this.orderService.create(orderForm.productOrders());
         return ResponseEntity.created(URI.create("uri")).body(order);
     }

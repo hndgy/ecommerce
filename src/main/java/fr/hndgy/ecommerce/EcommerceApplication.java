@@ -6,7 +6,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 
 import fr.hndgy.ecommerce.model.Product;
-import fr.hndgy.ecommerce.repository.ProductRepository;
 import fr.hndgy.ecommerce.service.product.ProductService;
 
 @SpringBootApplication

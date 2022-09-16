@@ -1,7 +1,6 @@
 package fr.hndgy.ecommerce.model;
 
 import javax.persistence.Column;
-import javax.persistence.Embeddable;
 import javax.persistence.EmbeddedId;
 import javax.persistence.Entity;
 import javax.persistence.Transient;
@@ -24,6 +23,15 @@ public class OrderProduct {
         this.pk.setProduct(product);
         this.quantity = quantity;
     }
+    
+
+    public OrderProduct(OrderProductPK pk, Integer quantity) {
+        this.pk = pk;
+        this.quantity = quantity;
+    }
+
+
+    public OrderProduct(){}
 
     @Transient
     public Product getProduct(){
@@ -34,5 +42,22 @@ public class OrderProduct {
     public Double getTotalPrice(){
         return getProduct().getPrice() * this.quantity;
     }
+
+    public OrderProductPK getPk() {
+        return pk;
+    }
+
+    public void setPk(OrderProductPK pk) {
+        this.pk = pk;
+    }
+
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
 
 }

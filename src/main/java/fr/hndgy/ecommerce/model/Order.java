@@ -11,17 +11,22 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.persistence.Transient;
 import javax.validation.Valid;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
 
 
 
 @Entity
 @Table(name = "orders")
+@JsonIdentityInfo(generator=ObjectIdGenerators.PropertyGenerator.class, property="orderProducts")
 public class Order {
-    @Id @GeneratedValue(strategy = GenerationType.AUTO)
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @JsonFormat(pattern = "dd/MM/yyyy HH:mm:ss")
@@ -33,7 +38,32 @@ public class Order {
     @JsonManagedReference
     @OneToMany(mappedBy = "pk.order")
     @Valid
+    @JsonIgnoreProperties({"hibernateLazyInitializer"})
     private List<OrderProduct> orderProducts = new ArrayList<>();
+
+    @Transient
+    public Double getTotalPrice(){
+        return this.orderProducts.stream()
+                                .map(e -> e.getTotalPrice())
+                                .reduce(0., (subtotal, price) ->(Double) subtotal + price );
+    }
+
+    @Transient
+    public int getNumberOfProduct(){
+        return this.orderProducts.size();
+    }
+
+    public Order() {
+    }
+
+    
+
+    public Order(Long id, LocalDateTime dateCreated, OrderStatus status, @Valid List<OrderProduct> orderProducts) {
+        this.id = id;
+        this.dateCreated = dateCreated;
+        this.status = status;
+        this.orderProducts = orderProducts;
+    }
 
     public Long getId() {
         return id;
